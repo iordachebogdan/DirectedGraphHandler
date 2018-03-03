@@ -3,4 +3,4 @@ project(DirectedGraphHandler)
 
 set(CMAKE_CXX_STANDARD 98)
 
-add_executable(DirectedGraphHandler main.cpp)
+add_executable(DirectedGraphHandler main.cpp linked_list.h)
