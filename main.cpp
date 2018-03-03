@@ -13,10 +13,12 @@ int main() {
         lst.push_back(s);
     }
 
-    for (linked_list::LinkedList< std::string >::iterator it = lst.begin(); it != lst.end(); ++it)
+    linked_list::LinkedList< std::string > lst2(lst);
+    for (linked_list::LinkedList< std::string >::iterator it = lst2.begin(); it != lst2.end(); ++it)
         std::cout << it->size() << ' ' << *it << '\n';
 
     lst.clear();
+    std::cout << lst.empty() << std::endl;
     lst.push_back("aaa");
     std::cout << lst.front() << std::endl;
 

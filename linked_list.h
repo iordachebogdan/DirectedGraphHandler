@@ -38,8 +38,8 @@ namespace linked_list {
         void clear();
         iterator begin() const;
         iterator end() const;
-        T& front();
-        T& back();
+        T& front() const;
+        T& back() const;
       private:
         LinkedListNode *first_, *last_;
 
@@ -111,9 +111,9 @@ namespace linked_list {
     template<typename T>
     LinkedList<T>::LinkedList(const LinkedList<T>& other) {
         if (other.empty())
-            (*this) = LinkedList();
+            this->first_ = this->last_ = NULL;
         else {
-            (*this) = LinkedList();
+            this->first_ = this->last_ = NULL;
             for (LinkedList<T>::iterator it = other.begin(); it != other.end(); ++it)
                 push_back(*it);
         }
@@ -122,7 +122,7 @@ namespace linked_list {
     template<typename T>
     LinkedList<T>& LinkedList<T>::operator=(const LinkedList &other) {
         clear();
-        (*this) = LinkedList();
+        this->first_ = this->last_ = NULL;
         for (LinkedList<T>::iterator it = other.begin(); it != other.end(); ++it)
             push_back(*it);
     }
@@ -167,12 +167,12 @@ namespace linked_list {
     }
 
     template<typename T>
-    T& LinkedList<T>::front() {
+    T& LinkedList<T>::front() const {
         return first_->data;
     }
 
     template<typename T>
-    T& LinkedList<T>::back() {
+    T& LinkedList<T>::back() const {
         return last_->data;
     }
 
