@@ -72,7 +72,7 @@ namespace util {
 
     template<typename T>
     const T& Stack<T>::top() const {
-        return Vector<T>::front();
+        return Vector<T>::back();
     }
 
     template<typename T>
