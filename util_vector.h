@@ -85,7 +85,7 @@ namespace util {
     Vector<T>::Vector(const Vector &rhs) {
         size_ = rhs.size_;
         capacity_ = rhs.capacity_;
-        data_ = (size_ == 0 ? NULL : new T[size_]);
+        data_ = (capacity_ == 0 ? NULL : new T[capacity_]);
         for (size_t i = 0; i < size_; ++i)
             data_[i] = rhs.data_[i];
     }
@@ -96,7 +96,7 @@ namespace util {
         capacity_ = rhs.capacity_;
         if (data_ != NULL)
             delete[] data_;
-        data_ = (size_ == 0 ? NULL : new T[size_]);
+        data_ = (capacity_ == 0 ? NULL : new T[capacity_]);
         for (size_t i = 0; i < size_; ++i)
             data_[i] = rhs.data_[i];
         return (*this);
