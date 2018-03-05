@@ -7,12 +7,12 @@
 
 #include <cstdlib> //included for NULL macro
 #include <exception>
-#include <exception>
 #include <algorithm>
 
 namespace util {
     typedef unsigned int size_t;
 
+    //implementation of STL-like vector
     template<typename T>
     class Vector {
       public:
@@ -62,7 +62,7 @@ namespace util {
         T& operator[] (size_t index);
         const T& operator[] (size_t index) const;
 
-      private:
+      protected:
         size_t size_, capacity_;
         T* data_;
 
@@ -99,6 +99,7 @@ namespace util {
         data_ = (size_ == 0 ? NULL : new T[size_]);
         for (size_t i = 0; i < size_; ++i)
             data_[i] = rhs.data_[i];
+        return (*this);
     }
 
     template<typename T>
