@@ -3,4 +3,4 @@ project(DirectedGraphHandler)
 
 set(CMAKE_CXX_STANDARD 98)
 
-add_executable(DirectedGraphHandler main.cpp util_vector.h util_stack.h directed_graph.h directed_graph.cpp directed_graph_exceptions.h)
+add_executable(DirectedGraphHandler main.cpp util_vector.h util_stack.h directed_graph.h directed_graph.cpp directed_graph_exceptions.h util_queue.h)

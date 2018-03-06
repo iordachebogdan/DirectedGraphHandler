@@ -8,6 +8,7 @@
 #include <iostream>
 #include <algorithm>
 #include "util_stack.h"
+#include "util_queue.h"
 #include "util_vector.h"
 #include "directed_graph_exceptions.h"
 
