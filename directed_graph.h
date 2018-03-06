@@ -106,7 +106,7 @@ namespace dgraph {
         bool is_acyclic() const;
 
         //method that returns a Vector containing the nodes in topological order
-        util::Vector< Node > topological_sort() const;
+        util::Vector< const Node* > topological_sort() const;
         //outputs the above Vector
         void output_topological_sort(std::ostream& out) const;
 
@@ -122,6 +122,8 @@ namespace dgraph {
                         util::Vector<int>& lowlink, util::Stack<int>& stack,
                         util::Vector<bool>& in_stack,
                         util::Vector< util::Vector< const Node* > >& scc) const;
+        void dfs_sort_top(int node_id, util::Vector<bool>& visited,
+                          util::Vector< const Node* >& res) const;
     };
 }
 

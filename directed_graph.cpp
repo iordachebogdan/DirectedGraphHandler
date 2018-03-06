@@ -218,7 +218,7 @@ namespace dgraph {
 
     void DirectedGraph::dfs(int source_id, util::Vector<const Node *> &res,
                             util::Vector<bool> &visited) const {
-        //implementation of BFS as explained here:
+        //implementation of DFS as explained here:
         //https://en.wikipedia.org/wiki/Depth-first_search
         visited[source_id] = true;
         res.push_back(&nodes_[source_id]);
@@ -284,6 +284,9 @@ namespace dgraph {
     void DirectedGraph::dfs_tarjan(int node_id, int &curr_idx, util::Vector<int> &idx, util::Vector<int> &lowlink,
                                    util::Stack<int> &stack, util::Vector<bool> &in_stack,
                                    util::Vector<util::Vector<const Node *> > &scc) const {
+        //implementation for obtaining the strongly connected components of a graph
+        //using Tarjan's algorithm:
+        // https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm
         curr_idx++;
         idx[node_id] = lowlink[node_id] = curr_idx;
         stack.push(node_id);
@@ -310,6 +313,51 @@ namespace dgraph {
                 in_stack[curr] = false;
             } while (curr != node_id);
         }
+    }
+
+    bool DirectedGraph::is_strongly_connected() const {
+        util::Vector< util::Vector< const Node* > > scc = get_strongly_connected_components();
+        //in a strongly connected graph there is only one strongly connected comp
+        return ((int)scc.size() == 1);
+    }
+
+    bool DirectedGraph::is_acyclic() const {
+        util::Vector< util::Vector< const Node* > > scc = get_strongly_connected_components();
+        //in a acyclic graph the no of nodes is equal to the no of scc
+        return ((int)scc.size() == node_count_);
+    }
+
+    util::Vector< const Node* > DirectedGraph::topological_sort() const {
+        if (!is_acyclic())
+            throw bad_top_sort();
+
+        util::Vector< const Node* > res;
+        util::Vector< bool > visited(node_count_, false);
+        for (int i = 0; i < node_count_; ++i)
+            if (!visited[i])
+                dfs_sort_top(i, visited, res);
+        std::reverse(res.begin(), res.end());
+        return res;
+    }
+
+    void DirectedGraph::output_topological_sort(std::ostream &out) const {
+        util::Vector< const Node* > res = topological_sort();
+        for (util::Vector< const Node* >::iterator it = res.begin(); it != res.end(); ++it)
+            out << (*it)->get_id() << ' ';
+        out << '\n';
+    }
+
+    void DirectedGraph::dfs_sort_top(int node_id, util::Vector<bool> &visited,
+                                     util::Vector<const Node *> &res) const {
+        //with a simple dfs in this graph we can obtain the reversed topological sort
+        //by adding each node at the end of its corresponding function call
+        visited[node_id] = true;
+        util::Vector< Node* > current_successors = nodes_[node_id].get_direct_successors();
+        for (util::Vector< Node* >::iterator it = current_successors.begin();
+             it != current_successors.end(); ++it)
+            if (!visited[(*it)->get_id()])
+                dfs((*it)->get_id(), res, visited);
+        res.push_back(&nodes_[node_id]);
     }
 
 }

@@ -13,6 +13,12 @@ namespace dgraph {
             return "Error in directed graph configuration!";
         }
     };
+
+    class bad_top_sort : public std::exception {
+        virtual const char* what() const throw() {
+            return "The graph has cycles!";
+        }
+    };
 }
 
 #endif //DIRECTEDGRAPHHANDLER_DIRECTED_GRAPH_EXCEPTIONS_H
