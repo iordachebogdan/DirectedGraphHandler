@@ -229,4 +229,33 @@ namespace dgraph {
                 dfs((*it)->get_id(), res, visited);
     }
 
+    util::Vector< util::Vector< bool > > DirectedGraph::get_path_matrix() const {
+        //does a Roy-Floyd-like approach of finding the path matrix
+        util::Vector< util::Vector< bool > > res(node_count_, util::Vector< bool >(node_count_, false));
+        for (int i = 0; i < node_count_; ++i) {
+            res[i][i] = true; //every node is accessible from itself
+            util::Vector< Node* > current_successors = nodes_[i].get_direct_successors();
+            for (util::Vector< Node* >::iterator it = current_successors.begin();
+                    it != current_successors.end(); ++it)
+                res[i][(*it)->get_id()] = true; //for each edge mark the corresponding path
+
+        }
+
+        for (int interm = 0; interm < node_count_; ++interm)
+            for (int first = 0; first < node_count_; ++first)
+                if (first != interm)
+                    for (int last = 0; last < node_count_; ++last)
+                        if (last != first && last != interm)
+                            res[first][last] |= (res[first][interm] && res[interm][last]);
+
+        return res;
+    }
+
+    void DirectedGraph::output_path_matrix(std::ostream &out) const {
+        util::Vector< util::Vector< bool > > res = get_path_matrix();
+        for (int i = 0; i < node_count_; ++i, out << '\n')
+            for (int j = 0; j < node_count_; ++j)
+                out << res[i][j];
+    }
+
 }
