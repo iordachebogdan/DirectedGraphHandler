@@ -77,13 +77,15 @@ namespace dgraph {
         int node_count() const;
         int edge_count() const;
 
+        const Node* get_node_by_id(int id) const;
+
         //returns a Vector containing the nodes in the order that they were accessed during the bfs
-        util::Vector< Node > breadth_first_search(int source_id = 0) const;
+        util::Vector< const Node* > breadth_first_search(int source_id = 0) const;
         //outputs the above Vector
         void output_breadth_first_search(std::ostream& out, int source_id = 0) const;
 
         //returns a Vector containing the nodes in the order that they were accessed during the dfs
-        util::Vector< Node > depth_first_search(int source_id = 0) const;
+        util::Vector< const Node* > depth_first_search(int source_id = 0) const;
         //outputs the above Vector
         void output_depth_first_search(std::ostream& out, int source_id = 0) const;
 
@@ -93,7 +95,7 @@ namespace dgraph {
         void output_path_matrix(std::ostream& out) const;
 
         //returns the list of scc as lists of Nodes
-        util::Vector< util::Vector< Node > > get_strongly_connected_components() const;
+        util::Vector< util::Vector< const Node* > > get_strongly_connected_components() const;
         //outputs the above list
         void output_strongly_connected_components(std::ostream& out) const;
 
@@ -113,6 +115,7 @@ namespace dgraph {
         util::Vector< Node > nodes_;
 
         void add_edge(int from, int to);
+        void bfs(int source_id, util::Vector< const Node* >& res) const;
     };
 }
 

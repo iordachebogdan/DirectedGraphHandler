@@ -156,11 +156,48 @@ namespace dgraph {
     int DirectedGraph::node_count() const { return node_count_; }
     int DirectedGraph::edge_count() const { return edge_count_; }
 
+    const Node* DirectedGraph::get_node_by_id(int id) const {
+        return &nodes_[id];
+    }
+
     void DirectedGraph::add_edge(int from, int to) {
         nodes_[from].add_direct_successor(&nodes_[to]);
         nodes_[to].add_direct_predecessor(&nodes_[from]);
     }
 
+    util::Vector< const Node* > DirectedGraph::breadth_first_search(int source_id) const {
+        if (source_id < 0 || source_id >= node_count_)
+            throw std::out_of_range("Invalid node id!");
+        util::Vector< const Node* > res;
+        bfs(source_id, res);
+        return res;
+    }
 
+    void DirectedGraph::output_breadth_first_search(std::ostream &out, int source_id) const {
+        util::Vector< const Node* > res = breadth_first_search(source_id);
+        for (util::Vector< const Node* >::iterator it = res.begin(); it != res.end(); ++it)
+            out << (*it)->get_id() << ' ';
+        out << '\n';
+    }
+
+    void DirectedGraph::bfs(int source_id, util::Vector<const Node *> &res) const {
+        util::Vector< bool > visited(node_count_, false); visited[source_id] = true;
+        util::Queue< int > queue; queue.push(source_id);
+        res.clear();
+
+        while (!queue.empty()) {
+            int current_id = queue.front();
+            queue.pop();
+            res.push_back(&nodes_[current_id]);
+
+            util::Vector< Node* > current_successors = nodes_[current_id].get_direct_successors();
+            for (util::Vector< Node* >::iterator it = current_successors.begin();
+                    it != current_successors.end(); ++it)
+                if (!visited[(*it)->get_id()]) {
+                    visited[(*it)->get_id()] = true;
+                    queue.push((*it)->get_id());
+                }
+        }
+    }
 
 }
