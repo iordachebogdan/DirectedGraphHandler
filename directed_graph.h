@@ -116,6 +116,8 @@ namespace dgraph {
 
         void add_edge(int from, int to);
         void bfs(int source_id, util::Vector< const Node* >& res) const;
+        void dfs(int source_id, util::Vector< const Node* >& res,
+                 util::Vector< bool >& visited) const;
     };
 }
 

@@ -181,6 +181,8 @@ namespace dgraph {
     }
 
     void DirectedGraph::bfs(int source_id, util::Vector<const Node *> &res) const {
+        //implementation of BFS as explained here:
+        //https://en.wikipedia.org/wiki/Breadth-first_search
         util::Vector< bool > visited(node_count_, false); visited[source_id] = true;
         util::Queue< int > queue; queue.push(source_id);
         res.clear();
@@ -198,6 +200,33 @@ namespace dgraph {
                     queue.push((*it)->get_id());
                 }
         }
+    }
+
+    util::Vector< const Node* > DirectedGraph::depth_first_search(int source_id) const {
+        util::Vector< const Node* > res;
+        util::Vector< bool > visited(node_count_, false);
+        dfs(source_id, res, visited);
+        return res;
+    }
+
+    void DirectedGraph::output_depth_first_search(std::ostream &out, int source_id) const {
+        util::Vector< const Node* > res = depth_first_search(source_id);
+        for (util::Vector< const Node* >::iterator it = res.begin(); it != res.end(); ++it)
+            out << (*it)->get_id() << ' ';
+        out << '\n';
+    }
+
+    void DirectedGraph::dfs(int source_id, util::Vector<const Node *> &res,
+                            util::Vector<bool> &visited) const {
+        //implementation of BFS as explained here:
+        //https://en.wikipedia.org/wiki/Depth-first_search
+        visited[source_id] = true;
+        res.push_back(&nodes_[source_id]);
+        util::Vector< Node* > current_successors = nodes_[source_id].get_direct_successors();
+        for (util::Vector< Node* >::iterator it = current_successors.begin();
+                it != current_successors.end(); ++it)
+            if (!visited[(*it)->get_id()])
+                dfs((*it)->get_id(), res, visited);
     }
 
 }
