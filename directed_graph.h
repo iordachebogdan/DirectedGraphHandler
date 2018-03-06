@@ -118,6 +118,10 @@ namespace dgraph {
         void bfs(int source_id, util::Vector< const Node* >& res) const;
         void dfs(int source_id, util::Vector< const Node* >& res,
                  util::Vector< bool >& visited) const;
+        void dfs_tarjan(int node_id, int& curr_idx, util::Vector<int>& idx,
+                        util::Vector<int>& lowlink, util::Stack<int>& stack,
+                        util::Vector<bool>& in_stack,
+                        util::Vector< util::Vector< const Node* > >& scc) const;
     };
 }
 

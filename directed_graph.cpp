@@ -258,4 +258,58 @@ namespace dgraph {
                 out << res[i][j];
     }
 
+    util::Vector< util::Vector< const Node* > > DirectedGraph::get_strongly_connected_components() const {
+        util::Vector< util::Vector< const Node* > > scc;
+        int curr_idx = 0;
+        util::Vector<int> idx(node_count_, 0);
+        util::Vector<int> lowlink(node_count_, 0);
+        util::Stack<int> stack;
+        util::Vector<bool> in_stack(node_count_, false);
+
+        for (int i = 0; i < node_count_; ++i)
+            if (idx[i] == 0)
+                dfs_tarjan(i, curr_idx, idx, lowlink, stack, in_stack, scc);
+
+        return scc;
+    }
+
+    void DirectedGraph::output_strongly_connected_components(std::ostream &out) const {
+        util::Vector< util::Vector< const Node* > > scc = get_strongly_connected_components();
+        out << scc.size() << '\n';
+        for (int i = 0; i < (int)scc.size(); ++i, out << '\n')
+            for (int j = 0; j < (int)scc[i].size(); ++j)
+                out << scc[i][j] << ' ';
+    }
+
+    void DirectedGraph::dfs_tarjan(int node_id, int &curr_idx, util::Vector<int> &idx, util::Vector<int> &lowlink,
+                                   util::Stack<int> &stack, util::Vector<bool> &in_stack,
+                                   util::Vector<util::Vector<const Node *> > &scc) const {
+        curr_idx++;
+        idx[node_id] = lowlink[node_id] = curr_idx;
+        stack.push(node_id);
+        in_stack[node_id] = true;
+
+        util::Vector< Node* > curr_successors = nodes_[node_id].get_direct_successors();
+        for (util::Vector< Node* >::iterator it = curr_successors.begin();
+                it != curr_successors.end(); ++it) {
+            if (idx[(*it)->get_id()] == 0) {
+                dfs_tarjan((*it)->get_id(), curr_idx, idx, lowlink, stack, in_stack, scc);
+                lowlink[node_id] = std::min(lowlink[node_id], lowlink[(*it)->get_id()]);
+            }
+            else if (in_stack[(*it)->get_id()])
+                lowlink[node_id] = std::min(lowlink[node_id], lowlink[(*it)->get_id()]);
+        }
+
+        if (idx[node_id] == lowlink[node_id]) {
+            scc.push_back(util::Vector<const Node*>());
+            int curr;
+            do {
+                curr = stack.top();
+                scc.back().push_back(&nodes_[curr]);
+                stack.pop();
+                in_stack[curr] = false;
+            } while (curr != node_id);
+        }
+    }
+
 }
