@@ -149,8 +149,9 @@ namespace dgraph {
                     graph.nodes_[i].get_direct_successors();
             for (util::Vector<Node*>::iterator it = current_node_successors.begin();
                     it != current_node_successors.end(); ++it)
-                out << i << " " << (*it)->get_id();
+                out << i << " " << (*it)->get_id() << '\n';
         }
+        return out;
     }
 
     int DirectedGraph::node_count() const { return node_count_; }
@@ -278,7 +279,7 @@ namespace dgraph {
         out << scc.size() << '\n';
         for (int i = 0; i < (int)scc.size(); ++i, out << '\n')
             for (int j = 0; j < (int)scc[i].size(); ++j)
-                out << scc[i][j] << ' ';
+                out << scc[i][j]->get_id() << ' ';
     }
 
     void DirectedGraph::dfs_tarjan(int node_id, int &curr_idx, util::Vector<int> &idx, util::Vector<int> &lowlink,
@@ -334,7 +335,7 @@ namespace dgraph {
         util::Vector< const Node* > res;
         util::Vector< bool > visited(node_count_, false);
         for (int i = 0; i < node_count_; ++i)
-            if (!visited[i])
+            if (!visited[i] && nodes_[i].get_in_degree() == 0)
                 dfs_sort_top(i, visited, res);
         std::reverse(res.begin(), res.end());
         return res;
@@ -356,7 +357,7 @@ namespace dgraph {
         for (util::Vector< Node* >::iterator it = current_successors.begin();
              it != current_successors.end(); ++it)
             if (!visited[(*it)->get_id()])
-                dfs((*it)->get_id(), res, visited);
+                dfs_sort_top((*it)->get_id(), visited, res);
         res.push_back(&nodes_[node_id]);
     }
 
