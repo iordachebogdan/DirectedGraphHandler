@@ -142,7 +142,7 @@ namespace dgraph {
         return in;
     }
 
-    std::ostream& operator << (std::ostream& out, DirectedGraph& graph) {
+    std::ostream& operator << (std::ostream& out, const DirectedGraph& graph) {
         out << graph.node_count_ << " " << graph.edge_count_ << "\n";
         for (int i = 0; i < graph.node_count_; ++i) {
             util::Vector<Node*> current_node_successors =
@@ -359,6 +359,41 @@ namespace dgraph {
             if (!visited[(*it)->get_id()])
                 dfs_sort_top((*it)->get_id(), visited, res);
         res.push_back(&nodes_[node_id]);
+    }
+
+    DirectedGraph DirectedGraph::operator+(const DirectedGraph& rhs) const {
+        if (rhs.node_count_ != node_count_)
+            throw bad_dgraph_config();
+        util::Vector< Edge > edges;
+
+        for (int node = 0; node < node_count_; ++node) {
+            util::Vector< Node* > current_successors;
+            current_successors = nodes_[node].get_direct_successors();
+            for (util::Vector< Node* >::iterator it = current_successors.begin();
+                 it != current_successors.end(); ++it)
+                edges.push_back(Edge(node, (*it)->get_id()));
+
+            current_successors = rhs.nodes_[node].get_direct_successors();
+            for (util::Vector< Node* >::iterator it = current_successors.begin();
+                 it != current_successors.end(); ++it)
+                edges.push_back(Edge(node, (*it)->get_id()));
+        }
+
+        DirectedGraph res;
+        int res_edge_count = 0;
+        res.node_count_ = node_count_;
+        for (int i = 0; i < node_count_; ++i)
+            res.nodes_.push_back(Node(i));
+
+        std::sort(edges.begin(), edges.end());
+        for (int i = 0; i < (int)edges.size(); ++i)
+            if (i == 0 || edges[i] != edges[i - 1]) {
+                res.add_edge(edges[i].from_node_id(), edges[i].to_node_id());
+                res_edge_count++;
+            }
+        res.edge_count_ = res_edge_count;
+
+        return res;
     }
 
 }

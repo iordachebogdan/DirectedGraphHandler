@@ -12,10 +12,10 @@ class Tester {
 
     void load_test(std::string path = "") {
         if (path == "")
-            std::cin >> directed_graph_;
+            std::cin >> directed_graph_ >> directed_graph_2_;
         else {
             std::ifstream fin(path.data());
-            fin >> directed_graph_;
+            fin >> directed_graph_ >> directed_graph_2_;
             fin.close();
         }
     }
@@ -33,7 +33,7 @@ class Tester {
 
     void print_graph(std::string path = "") {
         if (path == "")
-            std::cout << directed_graph_;
+            std::cout << directed_graph_ << '\n';
         else {
             std::ofstream fout(path.data());
             fout << directed_graph_ << '\n';
@@ -85,8 +85,18 @@ class Tester {
         }
     }
 
+    void graph_reunion(std::string path = "") {
+        if (path == "")
+            std::cout << directed_graph_ + directed_graph_2_ << '\n';
+        else {
+            std::ofstream fout(path.data());
+            fout << directed_graph_ + directed_graph_2_ << '\n';
+            fout.close();
+        }
+    }
+
   private:
-    dgraph::DirectedGraph directed_graph_;
+    dgraph::DirectedGraph directed_graph_, directed_graph_2_;
 };
 
 int main() {
@@ -97,6 +107,7 @@ int main() {
     tester.dfs("dfs.out");
     tester.scc("scc.out");
     tester.path_matrix("path_matrix.out");
+    tester.graph_reunion("graph_reunion.out");
     tester.print_graph("data.out");
 
     return 0;

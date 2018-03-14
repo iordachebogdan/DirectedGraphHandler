@@ -94,11 +94,12 @@ namespace util {
     Vector<T>& Vector<T>::operator = (const Vector &rhs) {
         size_ = rhs.size_;
         capacity_ = rhs.capacity_;
+        T* copied_data = (capacity_ == 0 ? NULL : new T[capacity_]);
+        for (size_t i = 0; i < size_; ++i)
+            copied_data[i] = rhs.data_[i];
         if (data_ != NULL)
             delete[] data_;
-        data_ = (capacity_ == 0 ? NULL : new T[capacity_]);
-        for (size_t i = 0; i < size_; ++i)
-            data_[i] = rhs.data_[i];
+        data_ = copied_data;
         return (*this);
     }
 
@@ -145,7 +146,7 @@ namespace util {
     template<typename T>
     const T& Vector<T>::front() const {
         if (empty())
-            throw std::out_of_range("Vector is empty!");
+            throw std::out_of_range("Container is empty!");
         return data_[0];
     }
 
@@ -159,7 +160,7 @@ namespace util {
     template<typename T>
     const T& Vector<T>::back() const {
         if (empty())
-            throw std::out_of_range("Vector is empty!");
+            throw std::out_of_range("Container is empty!");
         return data_[size_ - 1];
     }
 
@@ -194,7 +195,7 @@ namespace util {
     template <typename T>
     void Vector<T>::pop_back() {
         if (empty())
-            throw std::out_of_range("Vector is empty!");
+            throw std::out_of_range("Container is empty!");
         data_[--size_].~T();
     }
 

@@ -72,7 +72,7 @@ namespace dgraph {
         //          the first number representing the source of the edge, and the second one, the destination.
         //          no two edges can be identical and there must be no self-loops.
         friend std::istream& operator >> (std::istream& in, DirectedGraph& graph);
-        friend std::ostream& operator << (std::ostream& out, DirectedGraph& graph);
+        friend std::ostream& operator << (std::ostream& out, const DirectedGraph& graph);
 
         int node_count() const;
         int edge_count() const;
@@ -109,6 +109,9 @@ namespace dgraph {
         util::Vector< const Node* > topological_sort() const;
         //outputs the above Vector
         void output_topological_sort(std::ostream& out) const;
+
+        //does the reunion of two graphs
+        DirectedGraph operator+(const DirectedGraph& rhs) const;
 
       private:
         int node_count_, edge_count_;
