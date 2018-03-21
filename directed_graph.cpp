@@ -87,16 +87,17 @@ namespace dgraph {
         (*this) = rhs;
     }
     DirectedGraph& DirectedGraph::operator=(const DirectedGraph &rhs) {
-        clear_nodes();
-        node_count_ = rhs.node_count_;
-        edge_count_ = rhs.edge_count_;
         util::Vector<Edge> edges; //get all edges from rhs
-        for (int i = 0; i < node_count_; ++i) {
+        for (int i = 0; i < rhs.node_count_; ++i) {
             util::Vector<Node*> current_successors = rhs.nodes_[i]->get_direct_successors();
             for (util::Vector<Node*>::iterator it = current_successors.begin();
                  it != current_successors.end(); ++it)
                 edges.push_back(Edge(rhs.nodes_[i]->get_id(), (*it)->get_id()));
         }
+
+        clear_nodes();
+        node_count_ = rhs.node_count_;
+        edge_count_ = rhs.edge_count_;
         nodes_ = util::Vector<Node*>(node_count_, NULL);
         for (int i = 0; i < node_count_; ++i)
             nodes_[i] = new Node(i);
