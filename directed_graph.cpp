@@ -87,33 +87,37 @@ namespace dgraph {
         (*this) = rhs;
     }
     DirectedGraph& DirectedGraph::operator=(const DirectedGraph &rhs) {
+        clear_nodes();
         node_count_ = rhs.node_count_;
         edge_count_ = rhs.edge_count_;
         util::Vector<Edge> edges; //get all edges from rhs
         for (int i = 0; i < node_count_; ++i) {
-            util::Vector<Node*> current_successors = rhs.nodes_[i].get_direct_successors();
+            util::Vector<Node*> current_successors = rhs.nodes_[i]->get_direct_successors();
             for (util::Vector<Node*>::iterator it = current_successors.begin();
                  it != current_successors.end(); ++it)
-                edges.push_back(Edge(rhs.nodes_[i].get_id(), (*it)->get_id()));
+                edges.push_back(Edge(rhs.nodes_[i]->get_id(), (*it)->get_id()));
         }
-        nodes_ = util::Vector<Node>(node_count_);
+        nodes_ = util::Vector<Node*>(node_count_, NULL);
         for (int i = 0; i < node_count_; ++i)
-            nodes_[i].set_id(i);
+            nodes_[i] = new Node(i);
         for (int i = 0; i < (int)edges.size(); ++i)
             add_edge(edges[i].from_node_id(), edges[i].to_node_id());
         return (*this);
     }
 
-    DirectedGraph::~DirectedGraph() {};
+    DirectedGraph::~DirectedGraph() {
+        clear_nodes();
+    };
 
     std::istream& operator >> (std::istream &in, DirectedGraph &graph) {
+        graph.clear_nodes();
         if (!(in >> graph.node_count_)) throw bad_dgraph_config();
         if (!(in >> graph.edge_count_)) throw bad_dgraph_config();
         if (graph.node_count_ < 0 || graph.edge_count_ < 0) throw bad_dgraph_config();
 
-        graph.nodes_ = util::Vector<Node>(graph.node_count_);
+        graph.nodes_ = util::Vector<Node*>(graph.node_count_);
         for (int i = 0; i < graph.node_count_; ++i)
-            graph.nodes_[i].set_id(i);
+            graph.nodes_[i] = new Node(i);
 
         util::Vector< Edge > edges;
         for (int i = 0; i < graph.edge_count_; ++i) {
@@ -146,7 +150,7 @@ namespace dgraph {
         out << graph.node_count_ << " " << graph.edge_count_ << "\n";
         for (int i = 0; i < graph.node_count_; ++i) {
             util::Vector<Node*> current_node_successors =
-                    graph.nodes_[i].get_direct_successors();
+                    graph.nodes_[i]->get_direct_successors();
             for (util::Vector<Node*>::iterator it = current_node_successors.begin();
                     it != current_node_successors.end(); ++it)
                 out << i << " " << (*it)->get_id() << '\n';
@@ -158,12 +162,19 @@ namespace dgraph {
     int DirectedGraph::edge_count() const { return edge_count_; }
 
     const Node* DirectedGraph::get_node_by_id(int id) const {
-        return &nodes_[id];
+        return nodes_[id];
     }
 
     void DirectedGraph::add_edge(int from, int to) {
-        nodes_[from].add_direct_successor(&nodes_[to]);
-        nodes_[to].add_direct_predecessor(&nodes_[from]);
+        nodes_[from]->add_direct_successor(nodes_[to]);
+        nodes_[to]->add_direct_predecessor(nodes_[from]);
+    }
+
+    void DirectedGraph::clear_nodes() {
+        for (int i = 0; i < node_count_; ++i)
+            if (nodes_[i] != NULL)
+                delete nodes_[i];
+        nodes_.clear();
     }
 
     util::Vector< const Node* > DirectedGraph::breadth_first_search(int source_id) const {
@@ -191,9 +202,9 @@ namespace dgraph {
         while (!queue.empty()) {
             int current_id = queue.front();
             queue.pop();
-            res.push_back(&nodes_[current_id]);
+            res.push_back(nodes_[current_id]);
 
-            util::Vector< Node* > current_successors = nodes_[current_id].get_direct_successors();
+            util::Vector< Node* > current_successors = nodes_[current_id]->get_direct_successors();
             for (util::Vector< Node* >::iterator it = current_successors.begin();
                     it != current_successors.end(); ++it)
                 if (!visited[(*it)->get_id()]) {
@@ -222,8 +233,8 @@ namespace dgraph {
         //implementation of DFS as explained here:
         //https://en.wikipedia.org/wiki/Depth-first_search
         visited[source_id] = true;
-        res.push_back(&nodes_[source_id]);
-        util::Vector< Node* > current_successors = nodes_[source_id].get_direct_successors();
+        res.push_back(nodes_[source_id]);
+        util::Vector< Node* > current_successors = nodes_[source_id]->get_direct_successors();
         for (util::Vector< Node* >::iterator it = current_successors.begin();
                 it != current_successors.end(); ++it)
             if (!visited[(*it)->get_id()])
@@ -235,7 +246,7 @@ namespace dgraph {
         util::Vector< util::Vector< bool > > res(node_count_, util::Vector< bool >(node_count_, false));
         for (int i = 0; i < node_count_; ++i) {
             res[i][i] = true; //every node is accessible from itself
-            util::Vector< Node* > current_successors = nodes_[i].get_direct_successors();
+            util::Vector< Node* > current_successors = nodes_[i]->get_direct_successors();
             for (util::Vector< Node* >::iterator it = current_successors.begin();
                     it != current_successors.end(); ++it)
                 res[i][(*it)->get_id()] = true; //for each edge mark the corresponding path
@@ -293,7 +304,7 @@ namespace dgraph {
         stack.push(node_id);
         in_stack[node_id] = true;
 
-        util::Vector< Node* > curr_successors = nodes_[node_id].get_direct_successors();
+        util::Vector< Node* > curr_successors = nodes_[node_id]->get_direct_successors();
         for (util::Vector< Node* >::iterator it = curr_successors.begin();
                 it != curr_successors.end(); ++it) {
             if (idx[(*it)->get_id()] == 0) {
@@ -309,7 +320,7 @@ namespace dgraph {
             int curr;
             do {
                 curr = stack.top();
-                scc.back().push_back(&nodes_[curr]);
+                scc.back().push_back(nodes_[curr]);
                 stack.pop();
                 in_stack[curr] = false;
             } while (curr != node_id);
@@ -335,7 +346,7 @@ namespace dgraph {
         util::Vector< const Node* > res;
         util::Vector< bool > visited(node_count_, false);
         for (int i = 0; i < node_count_; ++i)
-            if (!visited[i] && nodes_[i].get_in_degree() == 0)
+            if (!visited[i] && nodes_[i]->get_in_degree() == 0)
                 dfs_sort_top(i, visited, res);
         std::reverse(res.begin(), res.end());
         return res;
@@ -353,12 +364,12 @@ namespace dgraph {
         //with a simple dfs in this graph we can obtain the reversed topological sort
         //by adding each node at the end of its corresponding function call
         visited[node_id] = true;
-        util::Vector< Node* > current_successors = nodes_[node_id].get_direct_successors();
+        util::Vector< Node* > current_successors = nodes_[node_id]->get_direct_successors();
         for (util::Vector< Node* >::iterator it = current_successors.begin();
              it != current_successors.end(); ++it)
             if (!visited[(*it)->get_id()])
                 dfs_sort_top((*it)->get_id(), visited, res);
-        res.push_back(&nodes_[node_id]);
+        res.push_back(nodes_[node_id]);
     }
 
     DirectedGraph DirectedGraph::operator+(const DirectedGraph& rhs) const {
@@ -368,12 +379,12 @@ namespace dgraph {
 
         for (int node = 0; node < node_count_; ++node) {
             util::Vector< Node* > current_successors;
-            current_successors = nodes_[node].get_direct_successors();
+            current_successors = nodes_[node]->get_direct_successors();
             for (util::Vector< Node* >::iterator it = current_successors.begin();
                  it != current_successors.end(); ++it)
                 edges.push_back(Edge(node, (*it)->get_id()));
 
-            current_successors = rhs.nodes_[node].get_direct_successors();
+            current_successors = rhs.nodes_[node]->get_direct_successors();
             for (util::Vector< Node* >::iterator it = current_successors.begin();
                  it != current_successors.end(); ++it)
                 edges.push_back(Edge(node, (*it)->get_id()));
@@ -383,7 +394,7 @@ namespace dgraph {
         int res_edge_count = 0;
         res.node_count_ = node_count_;
         for (int i = 0; i < node_count_; ++i)
-            res.nodes_.push_back(Node(i));
+            res.nodes_.push_back(new Node(i));
 
         std::sort(edges.begin(), edges.end());
         for (int i = 0; i < (int)edges.size(); ++i)

@@ -16,8 +16,6 @@ namespace dgraph {
     class Node {
       public:
         explicit Node(int id = -1);
-        Node(const Node& rhs);
-        Node& operator = (const Node& rhs);
         virtual ~Node();
 
         int get_id() const;
@@ -36,6 +34,9 @@ namespace dgraph {
         bool operator != (const Node& rhs);
         bool operator < (const Node& rhs);
       private:
+        Node(const Node& rhs);
+        Node& operator = (const Node& rhs);
+
         int id_;
         util::Vector< Node* > direct_successors_;
         util::Vector< Node* > direct_predecessors_;
@@ -115,9 +116,10 @@ namespace dgraph {
 
       private:
         int node_count_, edge_count_;
-        util::Vector< Node > nodes_;
+        util::Vector< Node* > nodes_;
 
         void add_edge(int from, int to);
+        void clear_nodes();
         void bfs(int source_id, util::Vector< const Node* >& res) const;
         void dfs(int source_id, util::Vector< const Node* >& res,
                  util::Vector< bool >& visited) const;
