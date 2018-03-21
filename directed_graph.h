@@ -30,9 +30,9 @@ namespace dgraph {
         int get_in_degree() const;
         int get_out_degree() const;
 
-        bool operator == (const Node& rhs);
-        bool operator != (const Node& rhs);
-        bool operator < (const Node& rhs);
+        bool operator == (const Node& rhs) const;
+        bool operator != (const Node& rhs) const;
+        bool operator < (const Node& rhs) const;
       private:
         Node(const Node& rhs);
         Node& operator = (const Node& rhs);
@@ -52,9 +52,9 @@ namespace dgraph {
         int from_node_id() const;
         int to_node_id() const;
 
-        bool operator == (const Edge& rhs);
-        bool operator != (const Edge& rhs);
-        bool operator < (const Edge& rhs);
+        bool operator == (const Edge& rhs) const;
+        bool operator != (const Edge& rhs) const;
+        bool operator < (const Edge& rhs) const;
       private:
         int from_node_id_, to_node_id_;
     };
@@ -65,6 +65,10 @@ namespace dgraph {
         DirectedGraph(const DirectedGraph& rhs);
         DirectedGraph& operator = (const DirectedGraph& rhs);
         virtual ~DirectedGraph();
+
+        bool operator == (const DirectedGraph& rhs) const;
+        bool operator != (const DirectedGraph& rhs) const;
+        bool operator < (const DirectedGraph& rhs) const;
 
         //Methods for reading and writing the data of the graph from and to a stream
         //The input and output must respect the same format:

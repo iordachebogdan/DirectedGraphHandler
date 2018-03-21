@@ -45,9 +45,9 @@ namespace dgraph {
         return (int)direct_successors_.size();
     }
 
-    bool Node::operator == (const Node &rhs) { return id_ == rhs.id_; };
-    bool Node::operator != (const Node &rhs) { return id_ != rhs.id_; };
-    bool Node::operator < (const Node &rhs) { return id_ < rhs.id_; };
+    bool Node::operator == (const Node &rhs) const { return id_ == rhs.id_; };
+    bool Node::operator != (const Node &rhs) const { return id_ != rhs.id_; };
+    bool Node::operator < (const Node &rhs) const { return id_ < rhs.id_; };
 
     //implementation of Edge's methods
     Edge::Edge(int from_node_id, int to_node_id) :
@@ -70,13 +70,13 @@ namespace dgraph {
         return to_node_id_;
     }
 
-    bool Edge::operator == (const Edge &rhs) {
+    bool Edge::operator == (const Edge &rhs) const {
         return (to_node_id_ == rhs.to_node_id_ && from_node_id_ == rhs.from_node_id_);
     }
-    bool Edge::operator != (const Edge &rhs) {
+    bool Edge::operator != (const Edge &rhs) const {
         return (to_node_id_ != rhs.to_node_id_ || from_node_id_ != rhs.from_node_id_);
     }
-    bool Edge::operator < (const Edge &rhs) {
+    bool Edge::operator < (const Edge &rhs) const {
         return (from_node_id_  < rhs.from_node_id_ ||
                 (from_node_id_ == rhs.from_node_id_ && to_node_id_ < rhs.to_node_id_) );
     }
@@ -108,6 +108,17 @@ namespace dgraph {
     DirectedGraph::~DirectedGraph() {
         clear_nodes();
     };
+
+    bool DirectedGraph::operator == (const DirectedGraph& rhs) const {
+        return (node_count_ == rhs.node_count_ && edge_count_ == rhs.edge_count_);
+    }
+    bool DirectedGraph::operator != (const DirectedGraph& rhs) const {
+        return (node_count_ != rhs.node_count_ || edge_count_ == rhs.edge_count_);
+    }
+    bool DirectedGraph::operator < (const DirectedGraph& rhs) const {
+        return (node_count_ < rhs.node_count_ ||
+                (node_count_ == rhs.node_count_ && edge_count_ < rhs.edge_count_));
+    }
 
     std::istream& operator >> (std::istream &in, DirectedGraph &graph) {
         graph.clear_nodes();
