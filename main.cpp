@@ -95,6 +95,17 @@ class Tester {
         }
     }
 
+    void add_new_node(std::string path) {
+        if (path == "")
+            directed_graph_.add_new_node(std::cin);
+        else {
+            std::ifstream fin(path.data());
+            directed_graph_.add_new_node(fin);
+            fin.close();
+        }
+
+    }
+
   private:
     dgraph::DirectedGraph directed_graph_, directed_graph_2_;
 };
@@ -102,12 +113,13 @@ class Tester {
 int main() {
     Tester tester;
     tester.load_test("data.in");
-    tester.topological_sort("topological_sort.out");
+    //tester.topological_sort("topological_sort.out");
     tester.bfs("bfs.out");
     tester.dfs("dfs.out");
     tester.scc("scc.out");
     tester.path_matrix("path_matrix.out");
     tester.graph_reunion("graph_reunion.out");
+    tester.add_new_node("");
     tester.print_graph("data.out");
 
     return 0;

@@ -177,6 +177,37 @@ namespace dgraph {
         return nodes_[id];
     }
 
+    void DirectedGraph::add_new_node(std::istream &in) {
+        node_count_++;
+        nodes_.push_back(new Node(node_count_ - 1));
+
+        int new_edges_count;
+        if (!(in >> new_edges_count)) throw bad_dgraph_config();
+        util::Vector< Edge > new_edges;
+        while (new_edges_count--) {
+            int from, to;
+            if (!(in >> from)) throw bad_dgraph_config();
+            if (!(in >> to)) throw bad_dgraph_config();
+            if (0 > from || from >= node_count_ ||
+                    0 > to || to >= node_count_ ||
+                    (from != node_count_-1 && to != node_count_-1))
+                throw bad_dgraph_config();
+            if (from == to)
+                throw bad_dgraph_config();
+            new_edges.push_back(Edge(from, to));
+        }
+
+        std::sort(new_edges.begin(), new_edges.end());
+        for (int i = 0; i < (int)new_edges.size() - 1; ++i)
+            if (new_edges[i] == new_edges[i + 1])
+                throw bad_dgraph_config();
+
+        for (int i = 0; i < (int)new_edges.size(); ++i)
+            add_edge(new_edges[i].from_node_id(), new_edges[i].to_node_id());
+
+        edge_count_ += new_edges.size();
+    }
+
     void DirectedGraph::add_edge(int from, int to) {
         nodes_[from]->add_direct_successor(nodes_[to]);
         nodes_[to]->add_direct_predecessor(nodes_[from]);

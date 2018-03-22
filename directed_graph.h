@@ -83,6 +83,7 @@ namespace dgraph {
         int edge_count() const;
 
         const Node* get_node_by_id(int id) const;
+        void add_new_node(std::istream& in);
 
         //returns a Vector containing the nodes in the order that they were accessed during the bfs
         util::Vector< const Node* > breadth_first_search(int source_id = 0) const;
